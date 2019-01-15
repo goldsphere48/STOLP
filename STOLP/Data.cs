@@ -12,6 +12,7 @@ namespace STOLP
 
         public double[] Attributes = new double[MaxAttributes]; 
         public int ObjClass { get; set; }
+        public double weight;
         public Data(double[] attributes, int objClass = 0)
         {
             Attributes = attributes;

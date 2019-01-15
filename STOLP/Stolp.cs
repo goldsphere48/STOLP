@@ -58,6 +58,76 @@ namespace STOLP
             double maxIndent2 = 0;
             Data standard = new Data(new double[] { 0, 0 }, 0);
             Data standard2 = new Data(new double[] { 0, 0 }, 0);
+            int x = 10;
+            for (int i = 0; i < sample.Count; i++)
+            {
+                for (int j = 0; j < sample.Count; j++)
+                {
+                    if (metrics(sample[i], sample[j]) != 0)
+                    {
+                        if (sample[j].ObjClass == sample[i].ObjClass)
+                        {
+                            if (1 / metrics(sample[i], sample[j]) < x)
+                                sample[i].weight += 1 / metrics(sample[i], sample[j]);
+                            else sample[i].weight += x;
+                        }
+                        else
+                        {
+                            if (1 / metrics(sample[i], sample[j]) < x)
+                                anotherClass += 1 / metrics(sample[i], sample[j]);
+                            else anotherClass += x;
+                            //Console.WriteLine("2:" + anotherClass);
+                        }
+                    }
+                }
+                sample[i].weight -= anotherClass;
+                /*if (sample[i].ObjClass == 0)
+                {
+                    if (maxIndent < (sameClass - anotherClass))
+                    {
+                        maxIndent = (sameClass - anotherClass);
+                        //Console.WriteLine (maxIndent);
+                        standard = sample[i];
+                    }
+                }
+                else
+                {
+                    if (maxIndent2 < (sameClass - anotherClass))
+                    {
+                        maxIndent2 = (sameClass - anotherClass);
+                        //Console.WriteLine (maxIndent);
+                        standard2 = sample[i];
+                    }
+                }*/
+                sameClass = 0;
+                anotherClass = 0;
+            }
+            for (int i = 0; i < sample.Count; ++i)
+            {
+                if (sample[i].ObjClass == 0 && maxIndent < sample[i].weight)
+                {
+                    maxIndent = sample[i].weight;
+                    standard = sample[i];
+                }
+                else if (sample[i].ObjClass == 1 && maxIndent2 < sample[i].weight)
+                {
+                    maxIndent2 = sample[i].weight;
+                    standard2 = sample[i];
+                }
+            }
+            List<Data> standarts = new List<Data> { standard, standard2 };
+            return standarts;
+        }
+
+
+        /*public List<Data> findStandard(List<Data> sample)
+        {
+            double sameClass = 0;
+            double anotherClass = 0;
+            double maxIndent = 0;
+            double maxIndent2 = 0;
+            Data standard = new Data(new double[] { 0, 0 }, 0);
+            Data standard2 = new Data(new double[] { 0, 0 }, 0);
             for (int i = 0; i < sample.Count; i++)
             {
                 for (int j = 0; j < sample.Count; j++)
@@ -91,7 +161,7 @@ namespace STOLP
             }
             List<Data> standarts = new List<Data> { standard, standard2 };
             return standarts;
-        }
+        }*/
 
         public Data errors(List<Data> sample, List<Data> omega)
         {
@@ -115,19 +185,27 @@ namespace STOLP
             Data minError = new Data(new double[] { 0, 0}, 0);
             double min = int.MaxValue;
             List<Data> newOmega = new List<Data>();
+            int x = 100;
             for (int i = 0; i < sampleWithoutOmega.Count; i++)
             {
                 for (int j = 0; j < omega.Count; j++)
                 {
                     if (metrics(sampleWithoutOmega[i], omega[j]) != 0)
                     {
+
                         if (omega[j].ObjClass == sampleWithoutOmega[i].ObjClass)
                         {
-                            sameClass += 1 / metrics(sampleWithoutOmega[i], omega[j]);
+                            if (1 / metrics(sampleWithoutOmega[i], omega[j]) < x)
+                                sameClass += 1 / metrics(sampleWithoutOmega[i], omega[j]);
+                            else sameClass += x;
+                            //sameClass += 1 / metrics(sampleWithoutOmega[i], omega[j]);
                         }
                         else
                         {
-                            anotherClass += 1 / metrics(sampleWithoutOmega[i], omega[j]);
+                            if (1 / metrics(sampleWithoutOmega[i], omega[j]) < x)
+                                anotherClass += 1 / metrics(sampleWithoutOmega[i], omega[j]);
+                            else anotherClass += x;
+                            //anotherClass += 1 / metrics(sampleWithoutOmega[i], omega[j]);
                         }
                     }
                 }

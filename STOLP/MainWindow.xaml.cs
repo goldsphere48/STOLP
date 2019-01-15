@@ -25,6 +25,7 @@ namespace STOLP
         public ChartValues<ObservablePoint> ValuesA { get; set; }
         public ChartValues<ObservablePoint> ValuesB { get; set; }
         public ChartValues<ObservablePoint> ValuesC { get; set; }
+        public ChartValues<ObservablePoint> ValuesD { get; set; }
 
         private Stolp stolp = new Stolp();
         private List<Data> data;
@@ -37,6 +38,7 @@ namespace STOLP
             ValuesA = new ChartValues<ObservablePoint>();
             ValuesB = new ChartValues<ObservablePoint>();
             ValuesC= new ChartValues<ObservablePoint>();
+            ValuesD= new ChartValues<ObservablePoint>();
 
             DataContext = this;
 
@@ -65,6 +67,7 @@ namespace STOLP
                 ValuesA.Clear();
                 ValuesB.Clear();
                 ValuesC.Clear();
+                ValuesD.Clear();
 
                 List<Data> newData = new List<Data>();
                 List<Data> omega = stolp.stolp(data, int.Parse(deltaTextBox.Text), int.Parse(l0TextBox.Text));
@@ -81,11 +84,78 @@ namespace STOLP
                             case 0: ValuesA.Add(new ObservablePoint(obj.Attributes[0], obj.Attributes[1])); break;
                             case 1: ValuesB.Add(new ObservablePoint(obj.Attributes[0], obj.Attributes[1])); break;
                         }
+                        newData.Add(obj);
                     }
                 }
+
+                stolp.stolp(data, int.Parse(deltaTextBox.Text), int.Parse(l0TextBox.Text)).ForEach(i =>
+                {
+
+                    ValuesC.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1]));
+
+                });
+
+                List<Data> standarts = new List<Data>();
+                //standarts.AddRange(stolp.findStandard(data));
+                standarts.AddRange(stolp.findStandard(stolp.emissionСutOff(data, int.Parse(deltaTextBox.Text))));
+                standarts.ForEach(i =>
+                {
+
+                    ValuesD.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1]));
+
+                });
             } else
             {
                 MessageBox.Show("Сперва Выберите Файл c обучающей выборкой");
+            }
+                /*data.ForEach(i =>
+                {
+                    switch (i.ObjClass)
+                    {
+                        case 0: ValuesA.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1])); break;
+                        case 1: ValuesB.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1])); break;
+                    }
+                });
+
+                */
+
+        }
+
+        private void DrawLearningDataSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (data != null)
+            {
+                ValuesA.Clear();
+                ValuesB.Clear();
+                ValuesC.Clear();
+                ValuesD.Clear();
+
+                data.ForEach(i =>
+                {
+                    switch (i.ObjClass)
+                    {
+                        case 0: ValuesA.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1])); break;
+                        case 1: ValuesB.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1])); break;
+                    }
+                });
+
+                stolp.stolp(data, int.Parse(deltaTextBox.Text), int.Parse(l0TextBox.Text)).ForEach(i =>
+                {
+
+                    ValuesC.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1]));
+
+                });
+
+                List<Data> standarts = new List<Data>();
+                standarts.AddRange(stolp.findStandard(stolp.emissionСutOff(data, int.Parse(deltaTextBox.Text))));
+                //standarts.AddRange(stolp.findStandard(data));
+
+                standarts.ForEach(i =>
+                {
+
+                    ValuesD.Add(new ObservablePoint(i.Attributes[0], i.Attributes[1]));
+
+                });
             }
         }
     }
